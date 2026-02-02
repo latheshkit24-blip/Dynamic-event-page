@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Northview College Events</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+    }
+    header {
+        background: #003366;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    header img {
+        width: 60px;
+        height: 60px;
+        margin-right: 15px;
+    }
+    .logo-container {
+        display: flex;
+        align-items: center;
+    }
+    nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 15px;
+        font-weight: bold;
+    }
+    .search-bar {
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        padding: 10px;
+    }
+    .search-bar input {
+        width: 40%;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #777;
+    }
+    .filters {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        gap: 20px;
+    }
+    select, input[type="date"] {
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #777;
+    }
+    #events-container {
+        max-width: 900px;
+        margin: auto;
+    }
+    .event-card {
+        background: white;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+    }
+    .event-card h3 {
+        margin-top: 0;
+    }
+    .event-card button {
+        background: #003366;
+        color: white;
+        border: none;
+        padding: 10px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        gap: 10px;
+    }
+    .pagination button {
+        padding: 8px 15px;
+        border: none;
+        background: #003366;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    footer {
+        background: #002244;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        margin-top: 40px;
+    }
+    footer a {
+        color: white;
+        margin: 0 10px;
+        font-size: 20px;
+        text-decoration: none;
+    }
+</style>
+</head>
+<body>
+<header>
+    <div class="logo-container">
+        <img src="74165534-college-logo-element.jpg" alt="College Logo">
+        <h2>Northview College</h2>
+    </div>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">Events</a>
+        <a href="#">Admissions</a>
+        <a href="#">Contact</a>
+    </nav>
+</header>
+<div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search events by title or date...">
+</div>
+<div class="filters">
+    <select id="categoryFilter">
+        <option value="all">All Categories</option>
+        <option value="Sports">Sports</option>
+        <option value="Workshops">Workshops</option>
+        <option value="Guest Lecture">Guest Lecture</option>
+    </select>
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+
+</div>
+<div id="events-container"></div>
+<div class="pagination">
+    <button onclick="prevPage()">Previous</button>
+    <button onclick="nextPage()">Next</button>
+</div>
+<footer>
+    <p>Contact: +91 98765 43210 | info@northviewcollege.edu</p>
+    <a href="#">LinkedIn</a>
+    <a href="#">Facebook</a>
+    <a href="#">Twitter</a>
+</footer>
+<script>
+    const events = [
+        { title: "Sports Day", date: "2026-02-10", category: "Sports", description: "Annual sports day activities." },
+        { title: "Web Dev Workshop", date: "2026-02-14", category: "Workshops", description: "Hands-on frontend development workshop." },
+        { title: "Guest Talk - AI", date: "2026-02-18", category: "Guest Lecture", description: "AI expert discusses future trends." },
+        { title: "Cricket Tournament", date: "2026-02-20", category: "Sports", description: "Inter-department cricket matches." },
+        { title: "Photography Workshop", date: "2026-02-25", category: "Workshops", description: "Learn DSLR basics." },
+        { title: "Robotics Seminar", date: "2026-03-02", category: "Guest Lecture", description: "Intro to robotics." },
+        { title: "Marathon Event", date: "2026-03-05", category: "Sports", description: "5km and 10km marathon." }
+    ];
+    let currentPage = 1;
+    const eventsPerPage = 5;
+    function displayEvents(filteredEvents) {
+        const container = document.getElementById("events-container");
+        container.innerHTML = "";
+        const start = (currentPage - 1) * eventsPerPage;
+        const end   = start + eventsPerPage;
+        const eventsToShow = filteredEvents.slice(start, end);
+        eventsToShow.forEach(event => {
+            const card = document.createElement("div");
+            card.className = "event-card";
+            card.innerHTML = `
+                <h3>${event.title}</h3>
+                <p><b>Date:</b> ${event.date}</p>
+                <p>${event.description}</p>
+                <button>View Details</button>
+            `;
+            container.appendChild(card);
+        });
+    }
+    function filterEvents() {
+        let filtered = events;
+        const searchValue  = document.getElementById("searchInput").value.toLowerCase();
+        const categoryValue = document.getElementById("categoryFilter").value;
+        const start = document.getElementById("startDate").value;
+        const end   = document.getElementById("endDate").value;
+        if (searchValue) {
+            filtered = filtered.filter(
+                e => e.title.toLowerCase().includes(searchValue) ||
+                     e.date.includes(searchValue)
+            );
+        }
+        if (categoryValue !== "all") {
+            filtered = filtered.filter(e => e.category === categoryValue);
+        }
+        if (start) {
+            filtered = filtered.filter(e => e.date >= start);
+        }
+        if (end) {
+            filtered = filtered.filter(e => e.date <= end);
+        }
+        currentPage = 1;
+        displayEvents(filtered);
+    }
+    function nextPage() {
+        currentPage++;
+        filterEvents();
+    }
+
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            filterEvents();
+        }
+    }
+    document.getElementById("searchInput").addEventListener("input", filterEvents);
+    document.getElementById("categoryFilter").addEventListener("change", filterEvents);
+    document.getElementById("startDate").addEventListener("change", filterEvents);
+    document.getElementById("endDate").addEventListener("change", filterEvents);
+    displayEvents(events);
+</script>
+</body>
+</html>
